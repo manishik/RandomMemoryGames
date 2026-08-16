@@ -12,5 +12,6 @@ import org.springframework.context.annotation.Configuration;
                 description = "Create random-number or random-name memory rounds and submit guesses"
         )
 )
+// Sets the title, version, and description shown in Swagger.
 public class OpenApiConfig {
 }

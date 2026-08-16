@@ -16,9 +16,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class OpenApiTest {
 
+    // Sends test HTTP requests to the API without starting a real server.
     @Autowired
     private MockMvc mockMvc;
 
+    // Verifies that the home page redirects to Swagger UI.
     @Test
     void homeRedirectsToSwaggerUi() throws Exception {
         mockMvc.perform(get("/"))
@@ -26,6 +28,7 @@ class OpenApiTest {
                 .andExpect(header().string("Location", "/swagger-ui.html"));
     }
 
+    // Verifies that the OpenAPI document lists and describes every game endpoint.
     @Test
     void openApiDocumentContainsGameEndpoints() throws Exception {
         mockMvc.perform(get("/v3/api-docs"))
@@ -33,6 +36,10 @@ class OpenApiTest {
                 .andExpect(jsonPath("$.paths", hasKey("/api/number-game/round")))
                 .andExpect(jsonPath("$.paths", hasKey("/api/number-game/guess")))
                 .andExpect(jsonPath("$.paths", hasKey("/api/name-game/round")))
-                .andExpect(jsonPath("$.paths", hasKey("/api/name-game/guess")));
+                .andExpect(jsonPath("$.paths", hasKey("/api/name-game/guess")))
+                .andExpect(jsonPath("$.paths['/api/number-game/round'].post.description").isNotEmpty())
+                .andExpect(jsonPath("$.paths['/api/number-game/guess'].post.description").isNotEmpty())
+                .andExpect(jsonPath("$.paths['/api/name-game/round'].post.description").isNotEmpty())
+                .andExpect(jsonPath("$.paths['/api/name-game/guess'].post.description").isNotEmpty());
     }
 }
