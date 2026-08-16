@@ -1,0 +1,41 @@
+# This repository's UI and API projects were created and developed using IntelliJ IDEA.
+# Keep IDE-specific, generated, dependency, and local-only files out of Git.
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Java / Maven API
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# Node.js UI dependencies and build output
+node_modules/
+dist/
+build/
+.vite/
+.cache/
+coverage/
+*.tsbuildinfo
+
+# Local environment files (example templates may be committed)
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Operating-system files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*~
