@@ -459,11 +459,41 @@ textarea:focus-visible {
 }
 
 .hidden-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(5px, 1.4vw, 11px);
+  flex-wrap: wrap;
   margin: 28px 0;
   color: #a6aaae;
   font-family: 'DM Mono', monospace;
   font-size: clamp(1.3rem, 5vw, 2.15rem);
-  letter-spacing: 0.12em;
+  line-height: 1;
+}
+
+.digit-dot {
+  display: inline-block;
+  color: #a6aaae;
+  transform: scale(1);
+  transition: color 140ms ease, transform 140ms ease, text-shadow 140ms ease;
+}
+
+.digit-dot.is-filled {
+  color: #ec6947;
+  text-shadow: 0 3px 10px rgba(236, 105, 71, 0.28);
+  transform: scale(1.2);
+}
+
+.digit-progress-count {
+  flex: 0 0 100%;
+  margin-top: 3px;
+  color: #666c78;
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .guess-state label {
@@ -488,6 +518,7 @@ textarea:focus-visible {
   background: #fff;
   font-family: 'DM Mono', monospace;
   font-size: 1.15rem;
+  line-height: 1.15;
   transition: width 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
@@ -502,21 +533,38 @@ textarea:focus-visible {
   font-size: 0.85rem;
 }
 
+.guess-state input::placeholder,
+.name-guess-state textarea::placeholder {
+  color: #8a909b;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 500;
+  opacity: 1;
+}
+
+.guess-state input::placeholder {
+  font-size: clamp(1.25rem, 7vw, 2.25rem);
+}
+
+.name-guess-state textarea::placeholder {
+  font-size: clamp(1.15rem, 3vw, 1.35rem);
+}
+
 .name-guess-state textarea {
   display: block;
   width: 100%;
   max-width: 100%;
   margin-right: auto;
   margin-left: auto;
-  resize: both;
+  resize: vertical;
   border: 1px solid #d8d2ca;
   border-radius: 14px;
   padding: 16px 18px;
   color: #172033;
   background: #fff;
   font-family: 'DM Mono', monospace;
-  font-size: 1rem;
-  line-height: 1.6;
+  font-size: clamp(1.15rem, 3vw, 1.35rem);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
   transition: width 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
 }
 
@@ -1132,6 +1180,19 @@ html[data-theme='dark'] button:hover:not(:disabled) {
 
 html[data-theme='dark'] .hidden-number {
   color: #8490a8;
+}
+
+html[data-theme='dark'] .digit-dot {
+  color: #8490a8;
+}
+
+html[data-theme='dark'] .digit-dot.is-filled {
+  color: #ff805c;
+  text-shadow: 0 3px 12px rgba(255, 128, 92, 0.36);
+}
+
+html[data-theme='dark'] .digit-progress-count {
+  color: #aeb8cf;
 }
 
 html[data-theme='dark'] .guess-state label,

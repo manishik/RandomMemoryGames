@@ -11,6 +11,14 @@ import {
 import { formatQuantity } from '../../utils/formatQuantity.js'
 import { isIntegerInRange } from '../../utils/numberValidation.js'
 
+function getNumberFontSize(digitCount, scale = 1) {
+  const minimumFontSize = 1.5 * scale
+  const preferredFontSize = (115 / digitCount) * scale
+  const maximumFontSize = Math.min(6.6, 50 / digitCount) * scale
+
+  return `clamp(${minimumFontSize}rem, ${preferredFontSize}vw, ${maximumFontSize}rem)`
+}
+
 function ReadyScreen({ onStart }) {
   const [startingDigitChoice, setStartingDigitChoice] = useState('1')
   const [customStartingDigits, setCustomStartingDigits] = useState('')
@@ -87,9 +95,7 @@ function NumberScreen({
   isCountdownPaused,
   onToggleCountdownPause,
 }) {
-  const preferredFontSize = 115 / round.digitCount
-  const maximumFontSize = Math.min(6.6, 50 / round.digitCount)
-  const numberFontSize = `clamp(1.5rem, ${preferredFontSize}vw, ${maximumFontSize}rem)`
+  const numberFontSize = getNumberFontSize(round.digitCount)
 
   return (
     <div className="number-state">
@@ -112,6 +118,10 @@ function NumberScreen({
 
 function GuessScreen({ round, guess, error, isSubmitting, onGuessChange, onSubmit }) {
   const answerLength = Math.max(12, round.digitCount, guess.length)
+  const answerDigitCount = Math.max(1, round.digitCount, guess.length)
+  const answerFontSize = getNumberFontSize(answerDigitCount, 0.85)
+  const enteredDigitCount = guess.replace(/\D/g, '').length
+  const visibleDigitCount = Math.min(round.digitCount, 12)
 
   return (
     <GuessForm
@@ -122,8 +132,19 @@ function GuessScreen({ round, guess, error, isSubmitting, onGuessChange, onSubmi
       onSubmit={onSubmit}
     >
       <div className="hidden-number" aria-hidden="true">
-        {'• '.repeat(Math.min(round.digitCount, 12)).trim()}
-        {round.digitCount > 12 ? ' …' : ''}
+        {Array.from({ length: visibleDigitCount }, (_, index) => (
+          <span
+            className={`digit-dot${index < enteredDigitCount ? ' is-filled' : ''}`}
+            key={index}
+          >
+            •
+          </span>
+        ))}
+        {round.digitCount > 12 && (
+          <span className="digit-progress-count">
+            {Math.min(enteredDigitCount, round.digitCount)} / {round.digitCount} entered
+          </span>
+        )}
       </div>
       <label htmlFor="guess">Your answer</label>
       <input
@@ -133,7 +154,10 @@ function GuessScreen({ round, guess, error, isSubmitting, onGuessChange, onSubmi
         autoComplete="off"
         autoFocus
         value={guess}
-        style={{ width: `calc(${answerLength}ch + 38px)` }}
+        style={{
+          width: `calc(${answerLength}ch + 38px)`,
+          fontSize: answerFontSize,
+        }}
         onChange={(event) => onGuessChange(event.target.value.trim())}
         placeholder="Type the number"
         disabled={isSubmitting}
