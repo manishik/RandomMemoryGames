@@ -6,7 +6,9 @@ A beginner-friendly React application for practicing memory with two games:
 - **Random Name Game** — memorize first names, last names, or full names.
 
 Players can choose the memorization time, pause and resume the countdown, stop
-or restart a game, and use either the light or dark theme.
+or restart a game, and use either the light or dark theme. Number text and dot
+indicators resize to remain inside the game card, and long incorrect answers
+stack vertically so every digit remains visible.
 
 The UI uses React and Vite. It calls the Spring Boot API in
 `../random-game-api` to create rounds and check answers.
@@ -81,7 +83,10 @@ src/
 │   ├── useNumberGame.js      Number-game rules
 │   └── useNameGame.js        Name-game rules
 ├── constants/                Shared fixed labels
-├── utils/                    Small formatting and validation functions
+├── utils/
+│   ├── formatQuantity.js     Singular/plural text formatting
+│   ├── numberValidation.js   Whole-number range validation
+│   └── preventCopy.js        Shared display copy-prevention handler
 ├── App.jsx                   Selects the page and owns the theme
 ├── main.jsx                  Starts React
 └── styles.css                Layout and both color themes
@@ -141,6 +146,27 @@ The name game follows the same shared flow through `useNameGame` and
 `useMemorizeCountdown` owns the timer for both games. Pausing freezes the
 remaining time and progress bar; resuming continues from the same point.
 
+## Adaptive answers and progress
+
+The number game keeps long values inside their available space instead of
+using horizontal scrolling:
+
+- the number shown during memorization shrinks only when it reaches the card edge;
+- the typed number follows the same font and shrink-to-fit behavior;
+- one progress dot is shown for every expected digit;
+- dots fill and clear as digits are typed or deleted;
+- long incorrect results put the correct answer above the player's answer and
+  shrink each value to its own row.
+
+The name answer field also uses responsive text sizing and wraps long names
+inside the field.
+
+Displayed challenges and result answers use the shared `preventCopy.js`
+handler and `.copy-protected` style. This prevents normal text selection and
+copying for both numbers and names without blocking the answer inputs. It is a
+casual-game safeguard, not a security boundary: values delivered to the browser
+can still be inspected with browser developer tools.
+
 ## Game phases
 
 `useGameSession` stores one `phase`. The stage component uses it to choose the
@@ -172,6 +198,7 @@ The main shared modules are:
 | `CountdownBar.jsx` | Displays countdown controls for both games |
 | `GameStageLayouts.jsx` | Provides shared ready and answer-form layouts |
 | `GameStatusScreens.jsx` | Provides shared loading, result, stop, and error layouts |
+| `preventCopy.js` | Prevents normal selection/copying of displayed numbers and names |
 
 Number- and name-specific rules remain in their matching hooks and components.
 For example, number guesses require digits, while name guesses allow multiple
@@ -217,7 +244,9 @@ The answer inputs receive their value from React state and update that state in
 | `checkNameGuess` | `POST /api/name-game/guess` |
 
 During development, Vite forwards `/api/...` requests from port `5173` to the
-Spring Boot server on port `8080`.
+Spring Boot server on port `8080`. Browser developer tools therefore show the
+request URL on port `5173`; the forwarding to port `8080` happens inside the
+Vite development server.
 
 For a separately hosted API, set `VITE_NUMBER_API_URL` and `VITE_NAME_API_URL`
 when building. Never put passwords or secrets in Vite environment variables,
