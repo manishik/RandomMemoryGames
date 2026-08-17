@@ -10,6 +10,7 @@ import {
 } from '../GameStatusScreens.jsx'
 import { formatQuantity } from '../../utils/formatQuantity.js'
 import { isIntegerInRange } from '../../utils/numberValidation.js'
+import { preventCopy } from '../../utils/preventCopy.js'
 
 function getNumberFontSize(digitCount, scale = 1) {
   const minimumFontSize = 1.5 * scale
@@ -31,10 +32,6 @@ function getComparisonFontSize(digitCount) {
   const estimatedTextWidth = Math.max(1, digitCount) * 0.68
 
   return `min(1.05rem, calc((100cqw - 8px) / ${estimatedTextWidth}))`
-}
-
-function preventNumberCopy(event) {
-  event.preventDefault()
 }
 
 function ReadyScreen({ onStart }) {
@@ -119,9 +116,9 @@ function NumberScreen({
     <div className="number-state">
       <p className="stage-kicker">Memorize this number</p>
       <div
-        className="number-display protected-number"
+        className="number-display copy-protected"
         style={{ fontSize: numberFontSize }}
-        onCopy={preventNumberCopy}
+        onCopy={preventCopy}
       >
         {round.number}
       </div>
@@ -202,9 +199,9 @@ function ResultScreen({ result, onNextRound }) {
           <div className="comparison-value user-answer-value">
             <span>Your answer</span>
             <strong
-              className="protected-number"
+              className="copy-protected"
               style={{ fontSize: getComparisonFontSize(userAnswerLength) }}
-              onCopy={preventNumberCopy}
+              onCopy={preventCopy}
             >
               {result.userGuess}
             </strong>
@@ -212,9 +209,9 @@ function ResultScreen({ result, onNextRound }) {
           <div className="comparison-value correct-answer-value">
             <span>Correct answer</span>
             <strong
-              className="protected-number"
+              className="copy-protected"
               style={{ fontSize: getComparisonFontSize(correctAnswerLength) }}
-              onCopy={preventNumberCopy}
+              onCopy={preventCopy}
             >
               {result.correctNumber}
             </strong>

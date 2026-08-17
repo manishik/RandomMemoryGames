@@ -10,6 +10,7 @@ import {
 } from '../GameStatusScreens.jsx'
 import { NAME_MODE_LABELS } from '../../constants/nameModes.js'
 import { formatQuantity } from '../../utils/formatQuantity.js'
+import { preventCopy } from '../../utils/preventCopy.js'
 
 function normalizeName(name = '') {
   return name.trim().replaceAll(/\s+/g, ' ').toLowerCase()
@@ -79,7 +80,7 @@ function NamesScreen({
       <p className="stage-kicker">
         Memorize these {NAME_MODE_LABELS[round.nameMode].toLowerCase()}
       </p>
-      <ol className="name-display-list">
+      <ol className="name-display-list copy-protected" onCopy={preventCopy}>
         {round.names.map((name) => (
           <li key={name}>
             <span className="name-display-text">{name}</span>
@@ -137,7 +138,10 @@ function ResultScreen({ result, onNextRound }) {
       {!result.correct && (
         <div className="name-answer-comparison">
           <p>Your answers compared with the correct names:</p>
-          <div className="comparison-table-scroll">
+          <div
+            className="comparison-table-scroll copy-protected"
+            onCopy={preventCopy}
+          >
             <table>
               <thead>
                 <tr>
