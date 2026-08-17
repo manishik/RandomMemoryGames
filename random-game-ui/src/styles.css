@@ -362,6 +362,11 @@ textarea:focus-visible {
   white-space: nowrap;
 }
 
+.protected-number {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .name-display-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));

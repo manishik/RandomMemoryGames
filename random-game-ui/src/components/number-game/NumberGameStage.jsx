@@ -33,6 +33,10 @@ function getComparisonFontSize(digitCount) {
   return `min(1.05rem, calc((100cqw - 8px) / ${estimatedTextWidth}))`
 }
 
+function preventNumberCopy(event) {
+  event.preventDefault()
+}
+
 function ReadyScreen({ onStart }) {
   const [startingDigitChoice, setStartingDigitChoice] = useState('1')
   const [customStartingDigits, setCustomStartingDigits] = useState('')
@@ -115,8 +119,9 @@ function NumberScreen({
     <div className="number-state">
       <p className="stage-kicker">Memorize this number</p>
       <div
-        className="number-display"
+        className="number-display protected-number"
         style={{ fontSize: numberFontSize }}
+        onCopy={preventNumberCopy}
       >
         {round.number}
       </div>
@@ -196,13 +201,21 @@ function ResultScreen({ result, onNextRound }) {
         >
           <div className="comparison-value user-answer-value">
             <span>Your answer</span>
-            <strong style={{ fontSize: getComparisonFontSize(userAnswerLength) }}>
+            <strong
+              className="protected-number"
+              style={{ fontSize: getComparisonFontSize(userAnswerLength) }}
+              onCopy={preventNumberCopy}
+            >
               {result.userGuess}
             </strong>
           </div>
           <div className="comparison-value correct-answer-value">
             <span>Correct answer</span>
-            <strong style={{ fontSize: getComparisonFontSize(correctAnswerLength) }}>
+            <strong
+              className="protected-number"
+              style={{ fontSize: getComparisonFontSize(correctAnswerLength) }}
+              onCopy={preventNumberCopy}
+            >
               {result.correctNumber}
             </strong>
           </div>
