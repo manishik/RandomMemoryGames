@@ -19,6 +19,20 @@ function getNumberFontSize(digitCount, scale = 1) {
   return `clamp(${minimumFontSize}rem, ${preferredFontSize}vw, ${maximumFontSize}rem)`
 }
 
+function getFittingNumberFontSize(baseDigitCount, contentDigitCount = baseDigitCount, reservedWidth = 8) {
+  const displayFontSize = getNumberFontSize(baseDigitCount)
+  const estimatedTextWidth = Math.max(1, contentDigitCount) * 0.68
+  const fittingFontSize = `calc((100cqw - ${reservedWidth}px) / ${estimatedTextWidth})`
+
+  return `min(${displayFontSize}, ${fittingFontSize})`
+}
+
+function getComparisonFontSize(digitCount) {
+  const estimatedTextWidth = Math.max(1, digitCount) * 0.68
+
+  return `min(1.05rem, calc((100cqw - 8px) / ${estimatedTextWidth}))`
+}
+
 function ReadyScreen({ onStart }) {
   const [startingDigitChoice, setStartingDigitChoice] = useState('1')
   const [customStartingDigits, setCustomStartingDigits] = useState('')
@@ -95,7 +109,7 @@ function NumberScreen({
   isCountdownPaused,
   onToggleCountdownPause,
 }) {
-  const numberFontSize = getNumberFontSize(round.digitCount)
+  const numberFontSize = getFittingNumberFontSize(round.digitCount)
 
   return (
     <div className="number-state">
@@ -117,14 +131,16 @@ function NumberScreen({
 }
 
 function GuessScreen({ round, guess, error, isSubmitting, onGuessChange, onSubmit }) {
-  const answerLength = Math.max(12, round.digitCount, guess.length)
   const answerDigitCount = Math.max(1, round.digitCount, guess.length)
-  const answerFontSize = getNumberFontSize(answerDigitCount, 0.85)
+  const answerFontSize = getFittingNumberFontSize(round.digitCount, answerDigitCount, 42)
   const enteredDigitCount = guess.replace(/\D/g, '').length
-  const visibleDigitCount = Math.min(round.digitCount, 12)
+  const filledDotCount = Math.min(enteredDigitCount, round.digitCount)
+  const remainingDotCount = round.digitCount - filledDotCount
+  const dotFontSize = `min(2.15rem, ${135 / round.digitCount}cqw)`
 
   return (
     <GuessForm
+      className="number-guess-state"
       title="What was the number?"
       error={error}
       isSubmitting={isSubmitting}
@@ -132,14 +148,10 @@ function GuessScreen({ round, guess, error, isSubmitting, onGuessChange, onSubmi
       onSubmit={onSubmit}
     >
       <div className="hidden-number" aria-hidden="true">
-        {Array.from({ length: visibleDigitCount }, (_, index) => (
-          <span
-            className={`digit-dot${index < enteredDigitCount ? ' is-filled' : ''}`}
-            key={index}
-          >
-            •
-          </span>
-        ))}
+        <div className="digit-dot-row" style={{ fontSize: dotFontSize }}>
+          <span className="digit-dots is-filled">{'•'.repeat(filledDotCount)}</span>
+          <span className="digit-dots">{'•'.repeat(remainingDotCount)}</span>
+        </div>
         {round.digitCount > 12 && (
           <span className="digit-progress-count">
             {Math.min(enteredDigitCount, round.digitCount)} / {round.digitCount} entered
@@ -149,15 +161,13 @@ function GuessScreen({ round, guess, error, isSubmitting, onGuessChange, onSubmi
       <label htmlFor="guess">Your answer</label>
       <input
         id="guess"
+        className="number-guess-input"
         type="text"
         inputMode="numeric"
         autoComplete="off"
         autoFocus
         value={guess}
-        style={{
-          width: `calc(${answerLength}ch + 38px)`,
-          fontSize: answerFontSize,
-        }}
+        style={{ fontSize: answerFontSize }}
         onChange={(event) => onGuessChange(event.target.value.trim())}
         placeholder="Type the number"
         disabled={isSubmitting}
@@ -168,6 +178,9 @@ function GuessScreen({ round, guess, error, isSubmitting, onGuessChange, onSubmi
 
 function ResultScreen({ result, onNextRound }) {
   const nextLevel = formatQuantity(result.nextDigitCount, 'digit')
+  const userAnswerLength = result.userGuess.length
+  const correctAnswerLength = result.correctNumber.length
+  const hasLongAnswers = Math.max(userAnswerLength, correctAnswerLength) > 20
 
   return (
     <ResultScreenLayout
@@ -177,14 +190,21 @@ function ResultScreen({ result, onNextRound }) {
       onNextRound={() => onNextRound(result.nextDigitCount)}
     >
       {!result.correct && (
-        <div className="number-answer-comparison" aria-label="Answer comparison">
+        <div
+          className={`number-answer-comparison${hasLongAnswers ? ' is-long' : ''}`}
+          aria-label="Answer comparison"
+        >
           <div className="comparison-value user-answer-value">
             <span>Your answer</span>
-            <strong>{result.userGuess}</strong>
+            <strong style={{ fontSize: getComparisonFontSize(userAnswerLength) }}>
+              {result.userGuess}
+            </strong>
           </div>
           <div className="comparison-value correct-answer-value">
             <span>Correct answer</span>
-            <strong>{result.correctNumber}</strong>
+            <strong style={{ fontSize: getComparisonFontSize(correctAnswerLength) }}>
+              {result.correctNumber}
+            </strong>
           </div>
         </div>
       )}
